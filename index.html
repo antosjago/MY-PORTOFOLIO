@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Janis Tri Putra — Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; cursor: default; }
+        body { background: #07090e; color: #f3f4f6; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; position: relative; }
+
+        /* Top Scroll Progress Bar */
+        #scrollProgress {
+            position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+            background: linear-gradient(90deg, #38bdf8, #34d399, #a855f7);
+            box-shadow: 0 0 12px #38bdf8, 0 0 20px #34d399;
+            z-index: 100001; transition: width 0.08s ease-out;
+        }
+
+        /* Custom Glowing Cursor Trail Effect */
+        .cursor-trail {
+            position: fixed; width: 10px; height: 10px; border-radius: 50%;
+            background: linear-gradient(135deg, #38bdf8, #34d399);
+            pointer-events: none; z-index: 99999;
+            box-shadow: 0 0 12px #38bdf8, 0 0 20px #34d399;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s;
+        }
+
+        /* Click Burst Particle */
+        .click-particle {
+            position: fixed; width: 6px; height: 6px; border-radius: 50%;
+            pointer-events: none; z-index: 99997;
+            animation: particleBurst 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes particleBurst {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* Epic Rocket Explosion Preloader */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #0d1322 0%, #07090e 100%);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 99998;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+            overflow: hidden;
+        }
+        #preloader.shake-screen {
+            animation: screenShake 0.45s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes screenShake {
+            10%, 90% { transform: translate3d(-4px, 2px, 0); }
+            20%, 80% { transform: translate3d(6px, -3px, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 4px, 0); }
+            40%, 60% { transform: translate3d(8px, -2px, 0); }
+        }
+
+        .loader-rocket-wrap {
+            position: relative; text-align: center;
+            animation: rocketFlyIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .loader-rocket {
+            font-size: 4.2rem; color: #38bdf8;
+            filter: drop-shadow(0 0 25px #38bdf8);
+            transform: rotate(-45deg);
+            display: inline-block; position: relative; z-index: 2;
+        }
+        .rocket-flame {
+            position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
+            width: 18px; height: 45px;
+            background: linear-gradient(to bottom, #ffffff, #38bdf8, #a855f7, transparent);
+            border-radius: 50% 50% 20% 20%;
+            filter: blur(2px);
+            animation: flameFlicker 0.08s infinite alternate;
+        }
+        @keyframes flameFlicker {
+            0% { transform: translateX(-50%) scaleY(0.85) scaleX(0.95); opacity: 0.85; }
+            100% { transform: translateX(-50%) scaleY(1.25) scaleX(1.1); opacity: 1; }
+        }
+        .exploding .rocket-flame { display: none; }
+
+        .explosion-ring {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            width: 12px; height: 12px; border: 4px solid #34d399; border-radius: 50%;
+            opacity: 0; pointer-events: none;
+        }
+        .explosion-ring-2 {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            width: 12px; height: 12px; border: 3px solid #a855f7; border-radius: 50%;
+            opacity: 0; pointer-events: none;
+        }
+        .explosion-flash {
+            position: fixed; inset: 0; background: radial-gradient(circle, rgba(56,189,248,0.45) 0%, transparent 70%);
+            opacity: 0; pointer-events: none;
+        }
+        .exploding .explosion-flash {
+            animation: flashBoom 0.6s ease-out forwards;
+        }
+        @keyframes flashBoom {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .exploding .loader-rocket {
+            animation: rocketExplode 0.55s ease forwards;
+        }
+        .exploding .explosion-ring {
+            animation: ringExpand 0.85s ease-out forwards;
+        }
+        .exploding .explosion-ring-2 {
+            animation: ringExpand2 1s ease-out 0.12s forwards;
+        }
+        .loader-title {
+            font-size: 2.7rem; font-weight: 800; margin-top: 20px; letter-spacing: 3px;
+            background: linear-gradient(135deg, #38bdf8 0%, #34d399 50%, #a855f7 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            opacity: 0; transform: scale(0.5);
+        }
+        .exploding .loader-title {
+            animation: titleReveal 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .boom-spark {
+            position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; border-radius: 50%;
+            pointer-events: none;
+            animation: sparkFly 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes sparkFly {
+            0% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; }
+        }
+
+        @keyframes rocketFlyIn {
+            0% { transform: translateY(320px) scale(0.2); opacity: 0; }
+            80% { transform: translateY(-10px) scale(1.05); opacity: 1; }
+            100% { transform: translateY(0px) scale(1); opacity: 1; }
+        }
+        @keyframes rocketExplode {
+            0% { transform: rotate(-45deg) scale(1); opacity: 1; }
+            40% { transform: rotate(20deg) scale(2.4); opacity: 0.9; filter: drop-shadow(0 0 60px #34d399); }
+            100% { transform: rotate(90deg) scale(0); opacity: 0; }
+        }
+        @keyframes ringExpand {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; border-color: #38bdf8; }
+            50% { border-color: #34d399; }
+            100% { transform: translate(-50%, -50%) scale(55); opacity: 0; border-width: 1px; }
+        }
+        @keyframes ringExpand2 {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; border-color: #a855f7; }
+            100% { transform: translate(-50%, -50%) scale(42); opacity: 0; border-width: 1px; }
+        }
+        @keyframes titleReveal {
+            0% { opacity: 0; transform: scale(0.4); filter: blur(8px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+
+        /* Moving Canvas Stars & Flowing Glowing Orbs */
+        #starCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -3; pointer-events: none;
+        }
+
+        .orb-1 { position: fixed; top: 10%; left: 15%; width: 450px; height: 450px; background: rgba(56, 189, 248, 0.18); filter: blur(140px); border-radius: 50%; z-index: -2; animation: moveOrb1 12s infinite alternate ease-in-out; }
+        .orb-2 { position: fixed; bottom: 10%; right: 15%; width: 450px; height: 450px; background: rgba(52, 211, 153, 0.18); filter: blur(140px); border-radius: 50%; z-index: -2; animation: moveOrb2 15s infinite alternate ease-in-out; }
+        .orb-3 { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 500px; background: rgba(168, 85, 247, 0.12); filter: blur(160px); border-radius: 50%; z-index: -2; animation: moveOrb3 18s infinite alternate ease-in-out; }
+
+        @keyframes moveOrb1 {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(100px, 80px) scale(1.2); }
+            100% { transform: translate(-50px, 120px) scale(0.9); }
+        }
+        @keyframes moveOrb2 {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-120px, -90px) scale(1.15); }
+            100% { transform: translate(80px, -60px) scale(1); }
+        }
+        @keyframes moveOrb3 {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-40%, -60%) scale(1.25); }
+            100% { transform: translate(-60%, -40%) scale(0.95); }
+        }
+
+        /* Floating Space Elements (Rocket, Shuttle & Planet) */
+        .floating-rocket {
+            position: fixed; right: 5%; top: 20%; font-size: 2.5rem; color: #38bdf8;
+            z-index: -1; pointer-events: none; opacity: 0.55;
+            filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.5));
+            animation: rocketFlight 8s ease-in-out infinite;
+        }
+        .floating-astronaut {
+            position: fixed; left: 3%; bottom: 15%; font-size: 2.8rem; color: #34d399;
+            z-index: -1; pointer-events: none; opacity: 0.45;
+            filter: drop-shadow(0 0 12px rgba(52, 211, 153, 0.5));
+            animation: astronautFloat 10s ease-in-out infinite;
+        }
+        .floating-satellite {
+            position: fixed; left: 6%; top: 24%; font-size: 2rem; color: #a855f7;
+            z-index: -1; pointer-events: none; opacity: 0.4;
+            filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.5));
+            animation: satelliteOrbit 14s linear infinite;
+        }
+
+        @keyframes rocketFlight {
+            0% { transform: translateY(0px) rotate(45deg); }
+            50% { transform: translateY(-40px) translateX(-20px) rotate(40deg); }
+            100% { transform: translateY(0px) rotate(45deg); }
+        }
+        @keyframes astronautFloat {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(30px) translateX(15px) rotate(-15deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        @keyframes satelliteOrbit {
+            0% { transform: rotate(0deg) translateX(18px) rotate(0deg); }
+            100% { transform: rotate(360deg) translateX(18px) rotate(-360deg); }
+        }
+
+        /* Elegant Entry Animation Classes */
+        .loaded .slide-down { animation: slideDown 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .loaded .slide-left { animation: slideLeft 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .loaded .slide-right { animation: slideRight 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .loaded .slide-up { animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        .initial-hidden { opacity: 0; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideLeft {
+            from { opacity: 0; transform: translateX(-60px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideRight {
+            from { opacity: 0; transform: translateX(60px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(60px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Floating Element Animation */
+        .floating { animation: floatingEffect 4s ease-in-out infinite; }
+        @keyframes floatingEffect {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Animated Hologram Border for Hero Card */
+        .holo-card {
+            position: relative;
+        }
+        .holo-card::before {
+            content: ''; position: absolute; inset: -1.5px; border-radius: 25px;
+            background: linear-gradient(120deg, #38bdf8, #34d399, #a855f7, #38bdf8);
+            background-size: 300% 300%;
+            z-index: -1; opacity: 0.45;
+            animation: holoGlow 5s ease infinite;
+        }
+        @keyframes holoGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Typewriter Cursor Blink */
+        .typing-cursor {
+            display: inline-block; width: 2px; height: 1.1em; background: #34d399;
+            margin-left: 4px; vertical-align: middle;
+            animation: blinkCursor 0.75s infinite;
+        }
+        @keyframes blinkCursor {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(18, 24, 38, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #38bdf8 0%, #34d399 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* Scroll-Driven Moving Font Effect */
+        .scroll-move-text {
+            display: inline-block;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* Tombol Gacor */
+        .btn-gacor {
+            background: linear-gradient(135deg, #38bdf8 0%, #34d399 100%);
+            color: #07090e; padding: 14px 30px; border-radius: 14px; font-weight: 700; text-decoration: none;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.35); display: inline-block; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
+            position: relative; overflow: hidden;
+        }
+        .btn-gacor::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+            transform: skewX(-25deg); transition: 0.5s;
+        }
+        .btn-gacor:hover::after {
+            left: 130%;
+        }
+        .btn-gacor:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 0 40px rgba(52, 211, 153, 0.6);
+        }
+
+        /* Instagram Special Button */
+        .btn-instagram {
+            background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+            color: #ffffff; padding: 16px 32px; border-radius: 16px; font-weight: 800; text-decoration: none;
+            box-shadow: 0 0 30px rgba(253, 29, 29, 0.4); display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; font-size: 1.1rem; width: 100%;
+        }
+        .btn-instagram:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 0 45px rgba(252, 176, 69, 0.7);
+        }
+
+        /* Navbar */
+        nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .nav-wrap { max-width: 1100px; margin: 0 auto; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-menu { display: flex; gap: 30px; list-style: none; }
+        .nav-menu a { color: #9ca3af; text-decoration: none; font-weight: 600; transition: 0.3s; cursor: pointer; position: relative; }
+        .nav-menu a:hover { color: #38bdf8; text-shadow: 0 0 10px rgba(56,189,248,0.5); }
+
+        /* Hero */
+        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 130px 20px 60px; max-width: 1100px; margin: 0 auto; }
+        .hero-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 50px; align-items: center; width: 100%; }
+
+        /* Sections & Scroll Reveal */
+        .section { padding: 90px 20px; max-width: 1100px; margin: 0 auto; opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .section.visible { opacity: 1; transform: translateY(0); }
+        .section-title { text-align: center; margin-bottom: 60px; font-size: 2.5rem; font-weight: 800; letter-spacing: -0.5px; overflow: hidden; }
+
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+
+        /* Interactive Tilt Card */
+        .card {
+            padding: 35px; border-radius: 24px; transition: transform 0.2s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            transform-style: preserve-style; perspective: 1000px;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .card:hover {
+            border-color: rgba(56, 189, 248, 0.45);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 25px rgba(56,189,248,0.18);
+        }
+
+        /* Skill Icon Pulse on Hover */
+        .skill-card i { transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .skill-card:hover i { transform: scale(1.2) rotate(-6deg); }
+
+        /* Certificate Thumbnail & Auto-Rotate Fix */
+        .cert-thumb-wrap {
+            width: 100%; height: 175px; border-radius: 14px; overflow: hidden;
+            margin-bottom: 18px; border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative; cursor: pointer; background: #0d111a;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cert-thumb-wrap img {
+            width: 175px; height: 280px; object-fit: cover;
+            transform: rotate(-90deg);
+            transition: transform 0.4s ease; cursor: pointer;
+        }
+        .cert-thumb-wrap:hover img {
+            transform: rotate(-90deg) scale(1.06);
+        }
+        .cert-overlay {
+            position: absolute; inset: 0; background: rgba(7, 9, 14, 0.55);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease; cursor: pointer;
+            color: #fff; font-weight: 700; font-size: 0.85rem; gap: 6px;
+        }
+        .cert-thumb-wrap:hover .cert-overlay {
+            opacity: 1;
+        }
+
+        /* Lightbox Modal (Landscape Upright) */
+        .modal-backdrop {
+            position: fixed; inset: 0; background: rgba(5, 7, 12, 0.92);
+            backdrop-filter: blur(12px); z-index: 100000;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px; opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-backdrop.active {
+            opacity: 1; visibility: visible;
+        }
+        .modal-content {
+            width: min(88vw, 820px); aspect-ratio: 1.414 / 1; position: relative;
+            border-radius: 20px; overflow: hidden; background: #0d111a;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+            display: flex; align-items: center; justify-content: center;
+            transform: scale(0.92); transition: transform 0.3s ease;
+        }
+        .modal-backdrop.active .modal-content {
+            transform: scale(1);
+        }
+        .modal-content img {
+            height: 100%; width: auto; max-width: none;
+            transform: rotate(-90deg) scale(1.414);
+            display: block;
+        }
+        .modal-close {
+            position: absolute; top: 14px; right: 14px; width: 38px; height: 38px;
+            border-radius: 50%; background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.25); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 1.1rem; transition: 0.2s; z-index: 10;
+        }
+        .modal-close:hover {
+            background: #38bdf8; color: #07090e;
+        }
+
+        footer { text-align: center; padding: 40px; color: #4b5563; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+
+        @media(max-width: 900px) {
+            .grid-3 { grid-template-columns: 1fr; }
+            .about-grid-custom { grid-template-columns: 1fr !important; }
+        }
+        @media(max-width: 768px) {
+            .hero-grid, .grid-4, .grid-2 { grid-template-columns: 1fr; }
+            .nav-menu { display: none; }
+            h1 { font-size: 2.5rem !important; }
+            .cursor-trail, .floating-rocket, .floating-astronaut, .floating-satellite { display: none; }
+        }
+    </style>
+</head>
+<body id="body">
+
+    <!-- Top Scroll Progress Bar -->
+    <div id="scrollProgress"></div>
+
+    <!-- Epic Rocket Explosion Preloader -->
+    <div id="preloader">
+        <div class="explosion-flash"></div>
+        <div id="loaderContainer" class="loader-rocket-wrap">
+            <div class="explosion-ring"></div>
+            <div class="explosion-ring-2"></div>
+            <div style="position: relative; display: inline-block;">
+                <i class="fa-solid fa-rocket loader-rocket"></i>
+                <div class="rocket-flame"></div>
+            </div>
+            <h2 class="loader-title">JANIS.DEV</h2>
+        </div>
+    </div>
+
+    <!-- Certificate Zoom Modal -->
+    <div id="certModal" class="modal-backdrop" onclick="closeCertModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeCertModal()" title="Tutup"><i class="fa-solid fa-xmark"></i></button>
+            <img src="sertifikat-inspirasi.jpg" alt="Sertifikat Kompetensi CV. Inspirasi Software">
+        </div>
+    </div>
+
+    <!-- Moving Starry Background Canvas, Constellation Lines, Shooting Stars, Flowing Orbs & Floating Space Elements -->
+    <canvas id="starCanvas"></canvas>
+    <div class="orb-1"></div>
+    <div class="orb-2"></div>
+    <div class="orb-3"></div>
+    <div class="floating-rocket"><i class="fa-solid fa-rocket"></i></div>
+    <div class="floating-astronaut"><i class="fa-solid fa-space-shuttle"></i></div>
+    <div class="floating-satellite"><i class="fa-solid fa-satellite"></i></div>
+
+    <!-- Navbar -->
+    <nav class="glass initial-hidden slide-down" style="animation-delay: 0.1s;">
+        <div class="nav-wrap">
+            <a href="#home" class="gradient-text" style="font-size: 1.35rem; font-weight: 800; text-decoration: none;"><i class="fa-solid fa-code"></i> JANIS.DEV</a>
+            <ul class="nav-menu">
+                <li><a href="#home">Beranda</a></li>
+                <li><a href="#about">Tentang</a></li>
+                <li><a href="#skills">Keahlian</a></li>
+                <li><a href="#projects">Proyek</a></li>
+                <li><a href="#contact">Kontak</a></li>
+            </ul>
+            <a href="#contact" class="btn-gacor" style="padding: 10px 22px; font-size: 0.9rem;">Hubungi</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero section visible">
+        <div class="hero-grid">
+            <div>
+                <div class="glass initial-hidden slide-left" style="padding: 8px 18px; border-radius: 50px; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 24px; border-color: rgba(56,189,248,0.3); animation-delay: 0.3s;">
+                    <i class="fa-solid fa-bolt" style="color: #38bdf8;"></i> <span id="typedRole" style="color: #38bdf8; font-size: 0.85rem; font-weight: 700;">Digital Marketing & Web Developer</span><span class="typing-cursor"></span>
+                </div>
+                <h1 class="initial-hidden slide-left" style="font-size: 3.8rem; font-weight: 800; line-height: 1.15; margin-bottom: 20px; animation-delay: 0.5s;">
+                    Halo, Saya <br><span class="gradient-text">Janis Tri Putra</span>
+                </h1>
+                <p class="initial-hidden slide-left" style="color: #9ca3af; font-size: 1.1rem; line-height: 1.7; margin-bottom: 35px; animation-delay: 0.7s;">
+                    Mahasiswa Digital Marketing & Praktisi Web Development. Berfokus pada pembuatan antarmuka web yang elegan, fungsional, dan estetis.
+                </p>
+                <div class="initial-hidden slide-up" style="display: flex; gap: 16px; animation-delay: 0.9s;">
+                    <a href="#projects" class="btn-gacor">Lihat Proyek</a>
+                    <a href="#contact" class="glass" style="color: #fff; padding: 14px 28px; border-radius: 14px; font-weight: 700; text-decoration: none; display: inline-block; transition: 0.3s;" onmouseover="this.style.borderColor='#38bdf8'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">Kontak</a>
+                </div>
+            </div>
+            <div>
+                <div class="glass card holo-card floating initial-hidden slide-right" style="aspect-ratio: 1; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; animation-delay: 0.6s;">
+                    <div style="position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(56,189,248,0.15); filter: blur(30px); border-radius: 50%;"></div>
+                    <div>
+                        <div style="width: 50px; height: 50px; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 1.3rem; margin-bottom: 20px;">
+                            <i class="fa-solid fa-laptop-code"></i>
+                        </div>
+                        <h3 style="font-size: 1.3rem; margin-bottom: 8px;">Creative Developer</h3>
+                        <p style="color: #9ca3af; font-size: 0.9rem;">Menggabungkan logika pemrograman dengan estetika visual terbaik.</p>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px;">
+                        <div class="glass card" style="padding: 15px; text-align: center;"><strong class="gradient-text" style="font-size: 0.95rem;">HTML/CSS</strong></div>
+                        <div class="glass card" style="padding: 15px; text-align: center;"><strong style="color: #34d399; font-size: 0.95rem;">PHP/VB</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <h2 class="section-title"><span class="scroll-move-text">Tentang <span class="gradient-text">Saya</span></span></h2>
+        <div style="display: grid; grid-template-columns: 1.1fr 1.3fr; gap: 30px; align-items: start;" class="about-grid-custom">
+            <div class="glass card tilt-card" style="height: 100%;">
+                <div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 16px;">Profil Singkat</h3>
+                    <p style="color: #9ca3af; line-height: 1.7; margin-bottom: 20px;">Saya adalah mahasiswa Digital Marketing di CEP-CCIT Fakultas Teknik Universitas Indonesia dan lulusan Rekayasa Perangkat Lunak (RPL) SMK Taruna Bangsa. Memiliki keahlian solid di bidang web development, desain grafis & video editing, administrasi profesional, serta hobi kompetitif eSports (PUBG Mobile & Blood Strike) yang hampir menjadi juara nasional.</p>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px; font-size: 0.9rem;">
+                    <span style="color: #38bdf8; font-weight: 600;">CCIT FTUI & SMK Taruna Bangsa</span>
+                    <span style="color: #34d399; font-weight: 600;">Bekasi, Jawa Barat</span>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                <div class="glass card tilt-card" style="padding: 22px;"><i class="fa-solid fa-graduation-cap" style="font-size: 1.4rem; color: #38bdf8; margin-bottom: 10px;"></i><h4 style="font-size: 0.95rem;">Digital Marketing</h4></div>
+                <div class="glass card tilt-card" style="padding: 22px;"><i class="fa-solid fa-laptop-code" style="font-size: 1.4rem; color: #34d399; margin-bottom: 10px;"></i><h4 style="font-size: 0.95rem;">Web Development</h4></div>
+                <div class="glass card tilt-card" style="padding: 22px;"><i class="fa-solid fa-gamepad" style="font-size: 1.4rem; color: #38bdf8; margin-bottom: 10px;"></i><h4 style="font-size: 0.95rem;">PUBG Mobile & eSports</h4></div>
+                <div class="glass card tilt-card" style="padding: 22px;"><i class="fa-solid fa-palette" style="font-size: 1.4rem; color: #34d399; margin-bottom: 10px;"></i><h4 style="font-size: 0.95rem;">Design & Editing</h4></div>
+                <div class="glass card tilt-card" style="padding: 22px;"><i class="fa-solid fa-camera" style="font-size: 1.4rem; color: #38bdf8; margin-bottom: 10px;"></i><h4 style="font-size: 0.95rem;">Fotografi</h4></div>
+                <div class="glass card tilt-card" style="padding: 22px;"><i class="fa-solid fa-briefcase" style="font-size: 1.4rem; color: #34d399; margin-bottom: 10px;"></i><h4 style="font-size: 0.95rem;">Administrasi</h4></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section">
+        <h2 class="section-title"><span class="scroll-move-text">Keahlian & <span class="gradient-text">Teknologi</span></span></h2>
+        <div class="grid-4">
+            <div class="glass card tilt-card skill-card" style="text-align: center;"><i class="fa-brands fa-html5" style="font-size: 3rem; color: #38bdf8; margin-bottom: 16px;"></i><h4 style="font-size: 1.1rem;">HTML & CSS</h4><p style="color: #9ca3af; font-size: 0.85rem; margin-top: 6px;">Frontend Design</p></div>
+            <div class="glass card tilt-card skill-card" style="text-align: center;"><i class="fa-brands fa-php" style="font-size: 3rem; color: #34d399; margin-bottom: 16px;"></i><h4 style="font-size: 1.1rem;">PHP</h4><p style="color: #9ca3af; font-size: 0.85rem; margin-top: 6px;">Backend Scripting</p></div>
+            <div class="glass card tilt-card skill-card" style="text-align: center;"><i class="fa-solid fa-window-maximize" style="font-size: 3rem; color: #38bdf8; margin-bottom: 16px;"></i><h4 style="font-size: 1.1rem;">VB.NET</h4><p style="color: #9ca3af; font-size: 0.85rem; margin-top: 6px;">Desktop App</p></div>
+            <div class="glass card tilt-card skill-card" style="text-align: center;"><i class="fa-solid fa-palette" style="font-size: 3rem; color: #34d399; margin-bottom: 16px;"></i><h4 style="font-size: 1.1rem;">Canva & CapCut</h4><p style="color: #9ca3af; font-size: 0.85rem; margin-top: 6px;">Design & Editing</p></div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+        <h2 class="section-title"><span class="scroll-move-text">Proyek <span class="gradient-text">Unggulan</span></span></h2>
+        <div class="grid-3">
+            <!-- Proyek 1 -->
+            <div class="glass card tilt-card">
+                <div>
+                    <span style="color: #38bdf8; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;">WEB DEVELOPMENT</span>
+                    <h3 style="font-size: 1.35rem; margin: 12px 0;">LPK Indoglobal Duta Mandiri</h3>
+                    <p style="color: #9ca3af; font-size: 0.92rem; line-height: 1.6; margin-bottom: 25px;">Website resmi lembaga pelatihan kerja yang dikembangkan dan di-deploy online untuk informasi publik.</p>
+                </div>
+                <a href="https://lpk-indoglobal-dutamandiri.netlify.app/" target="_blank" style="color: #38bdf8; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">Kunjungi Website <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem;"></i></a>
+            </div>
+
+            <!-- Proyek 2 -->
+            <div class="glass card tilt-card">
+                <div>
+                    <span style="color: #34d399; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;">WEB PROJECT</span>
+                    <h3 style="font-size: 1.35rem; margin: 12px 0;">Cukup.id</h3>
+                    <p style="color: #9ca3af; font-size: 0.92rem; line-height: 1.6; margin-bottom: 25px;">Proyek web interaktif dan kreatif yang dikembangkan secara mandiri dan dipublikasikan.</p>
+                </div>
+                <a href="https://antosjago.github.io/cukup-id/" target="_blank" style="color: #34d399; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">Kunjungi Website <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem;"></i></a>
+            </div>
+
+            <!-- Proyek 3: Sertifikat Inspirasi Software -->
+            <div class="glass card tilt-card">
+                <div>
+                    <div class="cert-thumb-wrap" onclick="openCertModal()">
+                        <img src="sertifikat-inspirasi.jpg" alt="Sertifikat Kompetensi CV. Inspirasi Software">
+                        <div class="cert-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i> Perbesar Sertifikat</div>
+                    </div>
+                    <span style="color: #a855f7; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;">DESKTOP APP & SERTIFIKASI</span>
+                    <h3 style="font-size: 1.35rem; margin: 10px 0;">Aplikasi Parkir Desktop</h3>
+                    <p style="color: #9ca3af; font-size: 0.92rem; line-height: 1.6; margin-bottom: 22px;">Uji Kompetensi Keahlian RPL bersama <strong>CV. Inspirasi Software</strong> — Pengembangan Aplikasi Parkir Berbasis Desktop (Predikat Kompeten)[cite: 2].</p>
+                </div>
+                <span onclick="openCertModal()" style="color: #a855f7; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">Lihat Sertifikat <i class="fa-solid fa-award" style="font-size: 0.9rem;"></i></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section (Direct Instagram Link) -->
+    <section id="contact" class="section">
+        <h2 class="section-title"><span class="scroll-move-text">Mari <span class="gradient-text">Terhubung</span></span></h2>
+        <div class="glass card tilt-card" style="max-width: 550px; margin: 0 auto; padding: 45px; text-align: center;">
+            <div style="width: 70px; height: 70px; background: rgba(253, 29, 29, 0.12); border: 1px solid rgba(253, 29, 29, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: #fd1d1d; font-size: 2rem;">
+                <i class="fa-brands fa-instagram"></i>
+            </div>
+            <h3 style="font-size: 1.5rem; margin-bottom: 12px;">Kirim Pesan via Instagram</h3>
+            <p style="color: #9ca3af; font-size: 0.95rem; line-height: 1.6; margin-bottom: 30px;">Ingin berkolaborasi, tanya seputar proyek, atau sekadar ngobrol? Langsung DM gw lewat Instagram ya!</p>
+            <a href="https://www.instagram.com/janistriputra_?evlk=MWFyMXA5MWNuNnY1OA%3D%3D&utm_source=qr" target="_blank" class="btn-instagram">
+                <i class="fa-brands fa-instagram" style="font-size: 1.3rem;"></i> Chat @janistriputra_
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Janis Tri Putra. All rights reserved.</p>
+    </footer>
+
+    <!-- Interactive Script -->
+    <script>
+        // Modal Lightbox for Certificate
+        function openCertModal() {
+            document.getElementById('certModal').classList.add('active');
+        }
+        function closeCertModal(e) {
+            if (!e || e.target === document.getElementById('certModal')) {
+                document.getElementById('certModal').classList.remove('active');
+            }
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeCertModal();
+        });
+
+        // Typewriter Effect for Role Badge
+        const roles = [
+            "Digital Marketing & Web Developer",
+            "Frontend & Desktop App Builder",
+            "PUBG Mobile & eSports Competitor"
+        ];
+        let roleIndex = 0;
+        let charIndex = roles[0].length;
+        let isDeleting = false;
+        const typedEl = document.getElementById('typedRole');
+
+        function typeLoop() {
+            const currentRole = roles[roleIndex];
+            if (isDeleting) {
+                charIndex--;
+                typedEl.textContent = currentRole.substring(0, charIndex);
+            } else {
+                charIndex++;
+                typedEl.textContent = currentRole.substring(0, charIndex);
+            }
+
+            let delay = isDeleting ? 45 : 85;
+            if (!isDeleting && charIndex === currentRole.length) {
+                delay = 2200;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                roleIndex = (roleIndex + 1) % roles.length;
+                delay = 400;
+            }
+            setTimeout(typeLoop, delay);
+        }
+        setTimeout(typeLoop, 2500);
+
+        // Scroll Progress Bar & Parallax Moving Font Effect
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = docHeight > 0 ? (scrollY / docHeight) * 100 : 0;
+            document.getElementById('scrollProgress').style.width = `${scrollPercent}%`;
+
+            const scrollTexts = document.querySelectorAll('.scroll-move-text');
+            scrollTexts.forEach((el, index) => {
+                const movement = Math.sin(scrollY * 0.004 + index) * 25;
+                el.style.transform = `translateX(${movement}px)`;
+            });
+        });
+
+        // Click Sparkle Burst Effect Anywhere on Page
+        window.addEventListener('click', (e) => {
+            const colors = ['#38bdf8', '#34d399', '#a855f7', '#ffffff'];
+            for (let i = 0; i < 12; i++) {
+                const p = document.createElement('div');
+                p.className = 'click-particle';
+                const angle = (Math.PI * 2 * i) / 12;
+                const dist = 35 + Math.random() * 45;
+                p.style.left = `${e.clientX}px`;
+                p.style.top = `${e.clientY}px`;
+                p.style.background = colors[i % colors.length];
+                p.style.boxShadow = `0 0 8px ${colors[i % colors.length]}`;
+                p.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
+                p.style.setProperty('--ty', `${Math.sin(angle) * dist}px`);
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 700);
+            }
+        });
+
+        // Cursor Sparkle Trail Effect
+        const coords = { x: -100, y: -100 };
+        const circles = [];
+        const numCircles = 15;
+
+        for (let i = 0; i < numCircles; i++) {
+            const div = document.createElement('div');
+            div.className = 'cursor-trail';
+            document.body.appendChild(div);
+            circles.push({ x: -100, y: -100, element: div });
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            coords.x = e.clientX;
+            coords.y = e.clientY;
+        });
+
+        function animateCursorTrail() {
+            let x = coords.x;
+            let y = coords.y;
+
+            circles.forEach((circle, index) => {
+                circle.x = x;
+                circle.y = y;
+                circle.element.style.left = `${x}px`;
+                circle.element.style.top = `${y}px`;
+
+                const scale = (numCircles - index) / numCircles;
+                circle.element.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+                const nextCircle = circles[index + 1] || circles[0];
+                x += (nextCircle.x - x) * 0.3;
+                y += (nextCircle.y - y) * 0.3;
+            });
+
+            requestAnimationFrame(animateCursorTrail);
+        }
+
+        animateCursorTrail();
+
+        // Canvas Moving Stars, Interactive Constellation Lines & Shooting Stars
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        const stars = [];
+        const numStars = 95;
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                radius: Math.random() * 2 + 0.6,
+                speedX: (Math.random() - 0.5) * 0.45,
+                speedY: (Math.random() - 0.5) * 0.45,
+                alpha: Math.random() * 0.7 + 0.3,
+                pulse: Math.random() * 0.02 + 0.01
+            });
+        }
+
+        const shootingStars = [];
+        function createShootingStar() {
+            shootingStars.push({
+                x: Math.random() * width,
+                y: 0,
+                length: Math.random() * 90 + 45,
+                speed: Math.random() * 11 + 7,
+                angle: Math.PI / 4,
+                opacity: 1
+            });
+        }
+
+        setInterval(() => {
+            if (Math.random() > 0.25) createShootingStar();
+        }, 2200);
+
+        function animateStars() {
+            ctx.clearRect(0, 0, width, height);
+
+            stars.forEach((star, i) => {
+                star.x += star.speedX;
+                star.y += star.speedY;
+
+                if (star.x < 0) star.x = width;
+                if (star.x > width) star.x = 0;
+                if (star.y < 0) star.y = height;
+                if (star.y > height) star.y = 0;
+
+                star.alpha += star.pulse;
+                if (star.alpha > 1 || star.alpha < 0.2) {
+                    star.pulse = -star.pulse;
+                }
+
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(56, 189, 248, ${star.alpha})`;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#38bdf8';
+                ctx.fill();
+
+                const dxMouse = star.x - coords.x;
+                const dyMouse = star.y - coords.y;
+                const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+                if (distMouse < 160) {
+                    ctx.beginPath();
+                    ctx.moveTo(star.x, star.y);
+                    ctx.lineTo(coords.x, coords.y);
+                    ctx.strokeStyle = `rgba(52, 211, 153, ${(1 - distMouse / 160) * 0.45})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+
+                for (let j = i + 1; j < stars.length; j++) {
+                    const dx = star.x - stars[j].x;
+                    const dy = star.y - stars[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 105) {
+                        ctx.beginPath();
+                        ctx.moveTo(star.x, star.y);
+                        ctx.lineTo(stars[j].x, stars[j].y);
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${(1 - dist / 105) * 0.14})`;
+                        ctx.lineWidth = 0.7;
+                        ctx.stroke();
+                    }
+                }
+            });
+
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#34d399';
+            shootingStars.forEach((s, index) => {
+                ctx.beginPath();
+                ctx.moveTo(s.x, s.y);
+                ctx.lineTo(s.x - s.length * Math.cos(s.angle), s.y - s.length * Math.sin(s.angle));
+                ctx.strokeStyle = `rgba(52, 211, 153, ${s.opacity})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                s.x += s.speed * Math.cos(s.angle);
+                s.y += s.speed * Math.sin(s.angle);
+                s.opacity -= 0.015;
+
+                if (s.opacity <= 0) {
+                    shootingStars.splice(index, 1);
+                }
+            });
+
+            requestAnimationFrame(animateStars);
+        }
+
+        animateStars();
+
+        // Rocket Explosion Preloader Trigger with Multi-Sparks & Screen Shake
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            const loaderContainer = document.getElementById('loaderContainer');
+            const body = document.getElementById('body');
+            
+            setTimeout(() => {
+                loaderContainer.classList.add('exploding');
+                preloader.classList.add('shake-screen');
+
+                const sparkColors = ['#38bdf8', '#34d399', '#a855f7', '#ffffff'];
+                for (let i = 0; i < 28; i++) {
+                    const spark = document.createElement('div');
+                    spark.className = 'boom-spark';
+                    const angle = (Math.PI * 2 * i) / 28 + (Math.random() * 0.2);
+                    const radius = 120 + Math.random() * 220;
+                    spark.style.background = sparkColors[i % sparkColors.length];
+                    spark.style.boxShadow = `0 0 12px ${sparkColors[i % sparkColors.length]}`;
+                    spark.style.setProperty('--sx', `${Math.cos(angle) * radius}px`);
+                    spark.style.setProperty('--sy', `${Math.sin(angle) * radius}px`);
+                    loaderContainer.appendChild(spark);
+                }
+            }, 1150);
+
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+                body.classList.add('loaded');
+            }, 2100);
+        });
+
+        // Scroll Reveal Animation
+        const sections = document.querySelectorAll('.section');
+        const revealSection = () => {
+            sections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                const triggerPoint = window.innerHeight * 0.85;
+                if (sectionTop < triggerPoint) {
+                    section.classList.add('visible');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealSection);
+
+        // 3D Tilt Effect for Cards
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -8;
+                const rotateY = ((x - centerX) / centerX) * 8;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+            });
+        });
+    </script>
+</body>
+</html>
